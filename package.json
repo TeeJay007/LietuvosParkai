@@ -1,0 +1,23 @@
+{
+  "name": "lietuvos-parkai",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "leaflet": "^1.7.1",
+    "vue": "^3.2.16"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.7.5",
+    "@vitejs/plugin-vue": "^1.9.2",
+    "autoprefixer": "^10.3.6",
+    "postcss": "^8.3.8",
+    "tailwindcss": "^2.2.16",
+    "typescript": "^4.4.3",
+    "vite": "^2.6.0",
+    "vue-tsc": "^0.3.0"
+  }
+}
