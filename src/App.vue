@@ -8,6 +8,8 @@ import parks from "./assets/parkai.json";
 import markerImg from './assets/tree.svg';
 import { ref } from "vue";
 import L, { Icon, LeafletMouseEvent } from "leaflet";
+import 'leaflet.markercluster'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 
 //TODO: SHOULD ONLY LOAD VISIBLE PARKS FROM THE SERVER!!!!
 const getParks = parks.map((park) => {
@@ -44,7 +46,9 @@ let map: null | L.Map = null;
 const onMapLoad = (m: L.Map) => {
   map = m
 
-  getParks.forEach(park => {
+  const allMarkers = L.markerClusterGroup();
+  
+  for(let park of getParks){
     const popUp = L.popup()
     .setContent(`
       <h1 class="text-xl font-bold text-center">${park.name}</h1>
@@ -52,16 +56,19 @@ const onMapLoad = (m: L.Map) => {
       <a href="#">Nurodymai keliaujant į čia.</a>
     `)
 
-    L.marker([park.coordinates.lat, park.coordinates.lon], {
+    const marker = L.marker([park.coordinates.lat, park.coordinates.lon], {
       icon: new Icon({
         iconUrl: markerImg,
         iconSize: [50, 50],
         popupAnchor:  [0, -30]
       })
-    }).addTo(m).on('click', (e:LeafletMouseEvent) => {
+    }).on('click', (e:LeafletMouseEvent) => {
       m.flyTo(e.latlng, 17)
     }).bindPopup(popUp);
-  })
+
+    allMarkers.addLayer(marker);
+  }
+  m.addLayer(allMarkers);
 };
 
 const handleZoom = (v: Address) => {
