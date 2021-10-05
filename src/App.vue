@@ -5,10 +5,12 @@ import Header from "./components/Header.vue";
 import Search from "./components/Search.vue";
 import Address from "./models/Address";
 import parks from "./assets/parkai.json";
+import markerImg from './assets/tree.svg';
 import { ref } from "vue";
+import L, { Icon, LeafletMouseEvent } from "leaflet";
 
-//TODO: Should load only parks by search over some api
-const getParks = parks.slice(0, 20).map((park) => {
+//TODO: SHOULD ONLY LOAD VISIBLE PARKS FROM THE SERVER!!!!
+const getParks = parks.map((park) => {
   const { country_code, postcode, road, town, village, city } = park.address;
 
   const address = [
@@ -39,7 +41,28 @@ const getParks = parks.slice(0, 20).map((park) => {
 let someParks = ref<Address[]>(getParks);
 
 let map: null | L.Map = null;
-const onMapLoad = (m: L.Map) => (map = m);
+const onMapLoad = (m: L.Map) => {
+  map = m
+
+  getParks.forEach(park => {
+    const popUp = L.popup()
+    .setContent(`
+      <h1 class="text-xl font-bold text-center">${park.name}</h1>
+      <p>${park.address}</p>
+      <a href="#">Nurodymai keliaujant į čia.</a>
+    `)
+
+    L.marker([park.coordinates.lat, park.coordinates.lon], {
+      icon: new Icon({
+        iconUrl: markerImg,
+        iconSize: [50, 50],
+        popupAnchor:  [0, -30]
+      })
+    }).addTo(m).on('click', (e:LeafletMouseEvent) => {
+      m.flyTo(e.latlng, 17)
+    }).bindPopup(popUp);
+  })
+};
 
 const handleZoom = (v: Address) => {
   if (map !== null) map.flyTo([v.coordinates.lat, v.coordinates.lon], 17);
