@@ -19,49 +19,57 @@ const emit =
 const like = ref(liked);
 
 const onLike = () => {
-  like.value = !like.value
-  if(like.value === false)
-    window.localStorage.removeItem(address.id)
-  else
-    window.localStorage.setItem(address.id, like.value.toString())
-}
+  like.value = !like.value;
+  if (like.value === false) window.localStorage.removeItem(address.id);
+  else window.localStorage.setItem(address.id, like.value.toString());
+};
 
 onMounted(() => {
-  const isLiked = window.localStorage.getItem(address.id)
-  like.value = isLiked !== null
-})
+  const isLiked = window.localStorage.getItem(address.id);
+  like.value = isLiked !== null;
+});
+
+const onClick = () => {
+  const mediaQuery = window.matchMedia("(min-width: 768px)");
+  if (mediaQuery.matches) emit("zoom-to", address);
+  else
+    window
+      .open(
+        <any>(
+          `https://maps.google.com/?q=${address.coordinates.lat},${address.coordinates.lon}`
+        ),
+        "_blank"
+      )
+      ?.focus();
+};
 </script>
 
 <template>
   <div :class="['flex border-b justify-between', like ? 'order-first' : '']">
     <div class="flex flex-1">
-      <button
-        type="button"
-        class="w-full text-left px-4"
-        @click="emit('zoom-to', address)"
-      >
-      <div>
-        <h1 class="font-bold text-xl truncate w-64" :title="address.name">
-          {{ address.name }}
-        </h1>
-        <div class="flex items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="flex-none text-green-500 h-5 w-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          <p class="truncate w-64" :title="address.address">
-            {{ address.address }}
-          </p>
+      <button type="button" class="w-full text-left px-4" @click="onClick">
+        <div>
+          <h1 class="font-bold text-xl truncate w-64" :title="address.name">
+            {{ address.name }}
+          </h1>
+          <div class="flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="flex-none text-green-500 h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <p class="truncate w-64" :title="address.address">
+              {{ address.address }}
+            </p>
+          </div>
         </div>
-      </div>
       </button>
     </div>
     <div class="flex align-middle">

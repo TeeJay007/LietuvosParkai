@@ -5,11 +5,11 @@ import Header from "./components/Header.vue";
 import Search from "./components/Search.vue";
 import Address from "./models/Address";
 import parks from "./assets/parkai.json";
-import markerImg from './assets/tree.svg';
+import markerImg from "./assets/tree.svg";
 import { ref } from "vue";
 import L, { Icon, LeafletMouseEvent } from "leaflet";
-import 'leaflet.markercluster'
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
+import "leaflet.markercluster";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
 //TODO: SHOULD ONLY LOAD VISIBLE PARKS FROM THE SERVER!!!!
 const getParks = parks.map((park) => {
@@ -34,8 +34,8 @@ const getParks = parks.map((park) => {
     name: park.name,
     address,
     coordinates: {
-      lat: park.coordinates.coordinates[1],
-      lon: park.coordinates.coordinates[0],
+      lat: parseFloat(park.coordinates.coordinates[1].toFixed(7)),
+      lon: parseFloat(park.coordinates.coordinates[0].toFixed(7)),
     },
   };
 });
@@ -44,27 +44,28 @@ let someParks = ref<Address[]>(getParks);
 
 let map: null | L.Map = null;
 const onMapLoad = (m: L.Map) => {
-  map = m
+  map = m;
 
   const allMarkers = L.markerClusterGroup();
-  
-  for(let park of getParks){
-    const popUp = L.popup()
-    .setContent(`
+
+  for (let park of getParks) {
+    const popUp = L.popup().setContent(`
       <h1 class="text-xl font-bold text-center">${park.name}</h1>
       <p>${park.address}</p>
-      <a href="#">Nurodymai keliaujant į čia.</a>
-    `)
+      <a target="_blank" href="https://maps.google.com/?q=${park.coordinates.lat},${park.coordinates.lon}">Nurodymai keliaujant į čia.</a>
+    `);
 
     const marker = L.marker([park.coordinates.lat, park.coordinates.lon], {
       icon: new Icon({
         iconUrl: markerImg,
         iconSize: [50, 50],
-        popupAnchor:  [0, -30]
+        popupAnchor: [0, -30],
+      }),
+    })
+      .on("click", (e: LeafletMouseEvent) => {
+        m.flyTo(e.latlng, 17);
       })
-    }).on('click', (e:LeafletMouseEvent) => {
-      m.flyTo(e.latlng, 17)
-    }).bindPopup(popUp);
+      .bindPopup(popUp);
 
     allMarkers.addLayer(marker);
   }
